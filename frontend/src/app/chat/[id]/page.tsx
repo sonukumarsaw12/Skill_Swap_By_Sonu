@@ -512,8 +512,8 @@ export default function Chat() {
 
             {/* Input Area */}
             <div className="absolute bottom-0 left-0 w-full p-3 md:p-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] z-20 bg-gradient-to-t from-gray-100 via-gray-100/90 to-transparent dark:from-[#0B0F19] dark:via-[#0B0F19]/90 pt-8">
-                <form onSubmit={sendMessage} className="max-w-4xl mx-auto flex items-center gap-2 bg-white dark:bg-gray-900 p-1.5 md:p-2 rounded-[2rem] shadow-xl border border-gray-200 dark:border-gray-800 ring-1 ring-gray-100 dark:ring-gray-800/50">
-                    <label className="cursor-pointer p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition text-gray-500 dark:text-gray-400 group">
+                <form onSubmit={sendMessage} className="max-w-4xl mx-auto flex items-center gap-2 bg-white dark:bg-gray-900 p-2 md:p-3 rounded-[2rem] shadow-xl border border-gray-200 dark:border-gray-800 ring-1 ring-gray-100 dark:ring-gray-800/50">
+                    <label className="cursor-pointer p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition text-gray-500 dark:text-gray-400 group flex-shrink-0">
                         <input
                             type="file"
                             className="hidden"
@@ -527,7 +527,7 @@ export default function Chat() {
                         value={newMessage}
                         onChange={handleInput}
                         placeholder="Type a message..."
-                        className="flex-1 bg-transparent border-none focus:ring-0 text-gray-900 dark:text-white placeholder-gray-400 px-2 py-2 text-base"
+                        className="flex-1 bg-transparent border-none focus:ring-0 text-gray-900 dark:text-white placeholder-gray-400 px-2 py-2 text-base min-w-0"
                     />
 
                     {uploading && <span className="text-xs text-indigo-500 font-medium animate-pulse">Uploading...</span>}
