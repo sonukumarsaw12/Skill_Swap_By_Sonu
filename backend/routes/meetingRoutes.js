@@ -9,9 +9,16 @@ const User = require('../models/User');
 // I will check the codebase for auth middleware in a moment, but for now I'll write the logic assuming `req.user` is populated or we strictly use IDs.
 
 // Create a new meeting
+// Create a new meeting
 router.post('/schedule', async (req, res) => {
     try {
         const { organizerId, participantId, title, description, startTime, duration } = req.body;
+        console.log("Scheduling Payload:", req.body); // Debug log
+
+        // Basic validation
+        if (!organizerId || !participantId || !title || !startTime) {
+            return res.status(400).json({ message: 'Missing required fields' });
+        }
 
         const newMeeting = new Meeting({
             organizer: organizerId,
@@ -26,7 +33,11 @@ router.post('/schedule', async (req, res) => {
         res.status(201).json(savedMeeting);
     } catch (err) {
         console.error("Error scheduling meeting:", err);
-        res.status(500).json({ message: 'Server error scheduling meeting' });
+        res.status(500).json({
+            message: 'Server error scheduling meeting',
+            error: err.message, // Return error details
+            stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+        });
     }
 });
 

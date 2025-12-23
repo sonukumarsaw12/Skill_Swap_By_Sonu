@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Calendar, Clock, Video } from 'lucide-react';
+import React, { useEffect, useState, useRef } from 'react';
+import { Calendar, Clock, Video, AlertCircle } from 'lucide-react';
 import axios from 'axios';
 
 interface Meeting {
@@ -14,9 +14,10 @@ interface Meeting {
     status: string;
 }
 
-const DashboardMeetings: React.FC<{ onJoinCall?: (partnerId: string) => void }> = ({ onJoinCall }) => {
+const DashboardMeetings: React.FC<{ onJoinCall?: (partnerId: string, meetingId: string, partnerName: string) => void }> = ({ onJoinCall }) => {
     const [meetings, setMeetings] = useState<Meeting[]>([]);
     const [loading, setLoading] = useState(true);
+    const notifiedMeetings = useRef<Set<string>>(new Set());
 
     useEffect(() => {
         const fetchMeetings = async () => {
@@ -37,6 +38,29 @@ const DashboardMeetings: React.FC<{ onJoinCall?: (partnerId: string) => void }> 
         fetchMeetings();
     }, []);
 
+    // Notification Logic
+    useEffect(() => {
+        const interval = setInterval(() => {
+            const now = new Date();
+            meetings.forEach(meeting => {
+                const meetingTime = new Date(meeting.startTime);
+                const timeDiff = meetingTime.getTime() - now.getTime();
+
+                // If meeting is within 5 minutes and not notified yet
+                if (timeDiff > 0 && timeDiff <= 5 * 60 * 1000 && !notifiedMeetings.current.has(meeting._id)) {
+                    notifiedMeetings.current.add(meeting._id);
+                    // Dispatch Custom Event for Toast
+                    const event = new CustomEvent('show-toast', {
+                        detail: { message: `Upcoming meeting: ${meeting.title} in 5 mins!`, type: 'success' }
+                    });
+                    window.dispatchEvent(event);
+                }
+            });
+        }, 60000); // Check every minute
+
+        return () => clearInterval(interval);
+    }, [meetings]);
+
     const formatDate = (dateString: string) => {
         const options: Intl.DateTimeFormatOptions = {
             weekday: 'short',
@@ -47,6 +71,25 @@ const DashboardMeetings: React.FC<{ onJoinCall?: (partnerId: string) => void }> 
             minute: '2-digit'
         };
         return new Date(dateString).toLocaleDateString('en-US', options);
+    };
+
+    const handleJoinClick = (meeting: Meeting, partnerId: string, partnerName: string) => {
+        const now = new Date();
+        const meetingTime = new Date(meeting.startTime);
+
+        // Allow joining 10 minutes before
+        const allowedTime = new Date(meetingTime.getTime() - 10 * 60 * 1000);
+
+        if (now < allowedTime) {
+            const event = new CustomEvent('show-toast', {
+                detail: { message: `Meeting hasn't started yet. Scheduled for ${new Date(meeting.startTime).toLocaleTimeString()}`, type: 'error' }
+            });
+            window.dispatchEvent(event);
+            return;
+        }
+
+        console.log("Joing call with:", partnerName);
+        onJoinCall?.(partnerId, meeting._id, partnerName);
     };
 
     if (loading) return (
@@ -82,7 +125,7 @@ const DashboardMeetings: React.FC<{ onJoinCall?: (partnerId: string) => void }> 
                 <Calendar className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                 Upcoming Sessions
             </h3>
-            <div className="grid gap-3">
+            <div className="grid gap-3 max-h-[320px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
                 {meetings.map((meeting) => {
                     const storedUser = localStorage.getItem('user');
                     const currentUser = storedUser ? JSON.parse(storedUser) : null;
@@ -103,14 +146,16 @@ const DashboardMeetings: React.FC<{ onJoinCall?: (partnerId: string) => void }> 
                             </div>
                             <div className="flex flex-col items-end gap-2">
                                 <span className={`px-2 py-1 rounded-full text-xs font-medium 
-                                    ${meeting.status === 'confirmed' ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400' :
-                                        meeting.status === 'pending' ? 'bg-yellow-100 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-400' : 'bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400'}`}>
+                                    ${meeting.status === 'completed' ? 'bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400' :
+                                        meeting.status === 'confirmed' ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400' :
+                                            meeting.status === 'pending' ? 'bg-yellow-100 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-400' :
+                                                'bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400'}`}>
                                     {meeting.status.charAt(0).toUpperCase() + meeting.status.slice(1)}
                                 </span>
                                 {/* In a real app, this would link to the specific meeting room or chat */}
                                 {['confirmed', 'pending'].includes(meeting.status) && (
                                     <button
-                                        onClick={() => onJoinCall?.(partner?._id)}
+                                        onClick={() => handleJoinClick(meeting, partner?._id, partner?.name || 'Partner')}
                                         className="mt-1 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg shadow-lg shadow-indigo-500/30 flex items-center gap-1.5 transition-all transform translate-y-0 opacity-100 lg:translate-y-2 lg:opacity-0 lg:group-hover:translate-y-0 lg:group-hover:opacity-100"
                                     >
                                         <Video className="w-3 h-3" /> Join

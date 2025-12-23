@@ -99,6 +99,11 @@ io.on('connection', (socket) => {
         io.to(receiverId).emit('typing', data); // Relay to receiver
     });
 
+    socket.on('toggleScreenShare', (data) => {
+        const { to } = data;
+        io.to(to).emit('toggleScreenShare', data);
+    });
+
     socket.on('stop_typing', (data) => {
         const { receiverId } = data;
         io.to(receiverId).emit('stop_typing', data);
@@ -139,9 +144,7 @@ io.on('connection', (socket) => {
         io.to(data.to).emit("endCall");
     });
 
-    socket.on("toggleScreenShare", (data) => {
-        io.to(data.to).emit("toggleScreenShare", data.isSharing);
-    });
+
 
     socket.on("toggleWhiteboard", (data) => {
         io.to(data.to).emit("toggleWhiteboard", data.isOpen);

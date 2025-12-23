@@ -81,8 +81,8 @@ export default function Signup() {
                                 <Zap className="w-4 h-4 text-white fill-white" />
                             </div>
                         </div>
-                        <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2 tracking-tight">Create Account</h2>
-                        <p className="text-gray-500 dark:text-gray-400 text-sm">Join the SkillSwap community today</p>
+                        <h2 className="text-3xl font-bold text-white mb-2 tracking-tight">Create Account</h2>
+                        <p className="text-gray-400 text-sm">Join the SkillSwap community today</p>
                     </div>
 
                     {error && (
@@ -101,7 +101,7 @@ export default function Signup() {
                                 name="name"
                                 value={name}
                                 onChange={onChange}
-                                className="w-full pl-12 pr-4 py-3 bg-gray-50/50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 outline-none transition-all text-base text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+                                className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 outline-none transition-all text-base text-white placeholder-gray-500"
                                 required
                             />
                         </div>
@@ -114,7 +114,7 @@ export default function Signup() {
                                 name="email"
                                 value={email}
                                 onChange={onChange}
-                                className="w-full pl-12 pr-4 py-3 bg-gray-50/50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 outline-none transition-all text-base text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+                                className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 outline-none transition-all text-base text-white placeholder-gray-500"
                                 required
                             />
                         </div>
@@ -128,7 +128,7 @@ export default function Signup() {
                                     name="password"
                                     value={password}
                                     onChange={onChange}
-                                    className="w-full pl-12 pr-4 py-3 bg-gray-50/50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 outline-none transition-all text-base text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+                                    className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 outline-none transition-all text-base text-white placeholder-gray-500"
                                     required
                                 />
                             </div>
@@ -140,7 +140,7 @@ export default function Signup() {
                                     name="confirmPassword"
                                     value={confirmPassword}
                                     onChange={onChange}
-                                    className="w-full pl-12 pr-4 py-3 bg-gray-50/50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 outline-none transition-all text-base text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+                                    className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 outline-none transition-all text-base text-white placeholder-gray-500"
                                     required
                                 />
                             </div>
@@ -154,7 +154,7 @@ export default function Signup() {
                                 name="skillsKnown"
                                 value={skillsKnown}
                                 onChange={onChange}
-                                className="w-full pl-12 pr-4 py-3 bg-gray-50/50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 outline-none transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+                                className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 outline-none transition-all text-white placeholder-gray-500"
                             />
                         </div>
 
@@ -166,7 +166,7 @@ export default function Signup() {
                                 name="skillsToLearn"
                                 value={skillsToLearn}
                                 onChange={onChange}
-                                className="w-full pl-12 pr-4 py-3 bg-gray-50/50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 outline-none transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+                                className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 outline-none transition-all text-white placeholder-gray-500"
                             />
                         </div>
 
@@ -180,9 +180,9 @@ export default function Signup() {
                     </form>
 
                     <div className="mt-8 text-center">
-                        <p className="text-gray-500 dark:text-gray-400 text-sm">
+                        <p className="text-gray-400 text-sm">
                             Already have an account?{' '}
-                            <Link href="/login" className="text-blue-600 font-semibold hover:text-blue-700 transition-colors">
+                            <Link href="/login" className="text-blue-500 font-semibold hover:text-blue-400 transition-colors">
                                 Log in
                             </Link>
                         </p>

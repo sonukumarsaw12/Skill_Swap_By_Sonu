@@ -116,26 +116,26 @@ export default function AdminDashboard() {
             <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] pointer-events-none"></div>
             <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-900/10 rounded-full blur-[120px] pointer-events-none"></div>
 
-            <div className="max-w-7xl mx-auto p-8 relative z-10">
+            <div className="max-w-7xl mx-auto p-4 md:p-8 relative z-10">
                 {/* Header */}
-                <header className="flex justify-between items-center mb-10 pb-6 border-b border-gray-800">
+                <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 md:mb-10 pb-6 border-b border-gray-800 gap-4">
                     <div>
-                        <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-                            <Shield className="w-8 h-8 text-blue-500" />
+                        <h1 className="text-2xl md:text-3xl font-bold text-white flex items-center gap-3">
+                            <Shield className="w-6 h-6 md:w-8 md:h-8 text-blue-500" />
                             Admin Command Center
                         </h1>
-                        <p className="text-gray-400 mt-1">Overview of platform activity and user base.</p>
+                        <p className="text-gray-400 mt-1 text-sm md:text-base">Overview of platform activity and user base.</p>
                     </div>
                     <button
                         onClick={handleLogout}
-                        className="flex items-center gap-2 px-4 py-2 bg-gray-900 border border-gray-700 rounded-xl hover:bg-gray-800 transition-colors text-sm font-medium"
+                        className="flex items-center gap-2 px-4 py-2 bg-gray-900 border border-gray-700 rounded-xl hover:bg-gray-800 transition-colors text-sm font-medium w-full md:w-auto justify-center"
                     >
                         <LogOut className="w-4 h-4" /> Logout
                     </button>
                 </header>
 
                 {/* Stats Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 text-white">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-10 text-white">
                     <div className="bg-gray-900/50 backdrop-blur-md border border-gray-800 p-6 rounded-2xl flex items-center gap-4 hover:border-blue-500/50 transition-colors group">
                         <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform">
                             <Users className="w-6 h-6" />
@@ -169,10 +169,10 @@ export default function AdminDashboard() {
 
                 {/* User Table Card */}
                 <div className="bg-gray-900/40 backdrop-blur-xl border border-gray-800 rounded-3xl overflow-hidden shadow-2xl">
-                    <div className="p-6 border-b border-gray-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="p-4 md:p-6 border-b border-gray-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <h2 className="text-xl font-bold text-white">Registered Users</h2>
 
-                        <div className="relative">
+                        <div className="relative w-full md:w-auto">
                             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
                             <input
                                 type="text"
@@ -184,22 +184,81 @@ export default function AdminDashboard() {
                         </div>
                     </div>
 
-                    <div className="overflow-x-auto">
+                    {/* Mobile Card View (< md) */}
+                    <div className="block md:hidden">
+                        {filteredUsers.length > 0 ? (
+                            <div className="grid gap-4 p-4">
+                                {filteredUsers.map(user => (
+                                    <div key={user._id} className="bg-gray-800/40 border border-gray-700/50 rounded-xl p-4 flex flex-col gap-3">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center text-sm font-bold text-white border border-gray-600">
+                                                    {user.profilePic ? (
+                                                        <img src={user.profilePic} alt="" className="w-full h-full rounded-full object-cover" />
+                                                    ) : (
+                                                        user.name.charAt(0)
+                                                    )}
+                                                </div>
+                                                <div>
+                                                    <div className="font-semibold text-white">{user.name}</div>
+                                                    <div className="text-xs text-gray-500">{user.email}</div>
+                                                </div>
+                                            </div>
+                                            {user.isAdmin ? (
+                                                <span className="px-2 py-1 rounded-full bg-purple-500/20 text-purple-300 text-xs font-bold border border-purple-500/30">Admin</span>
+                                            ) : (
+                                                <span className="px-2 py-1 rounded-full bg-gray-700/50 text-gray-300 text-xs font-bold border border-gray-600">User</span>
+                                            )}
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-2 text-sm">
+                                            <div>
+                                                <span className="text-gray-500 text-xs block">Joined</span>
+                                                <span className="text-gray-300">{new Date(user.createdAt).toLocaleDateString()}</span>
+                                            </div>
+                                            <div>
+                                                <span className="text-gray-500 text-xs block">Last Active</span>
+                                                {user.lastLogin ? (
+                                                    <span className="text-green-400">{new Date(user.lastLogin).toLocaleDateString()}</span>
+                                                ) : (
+                                                    <span className="text-gray-600 italic">Never</span>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {!user.isAdmin && (
+                                            <button
+                                                onClick={() => initiateDelete(user._id)}
+                                                className="mt-2 w-full py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm font-medium"
+                                            >
+                                                <Trash2 className="w-4 h-4" /> Delete User
+                                            </button>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="p-8 text-center text-gray-500">No users found.</div>
+                        )}
+                    </div>
+
+                    {/* Tablet/Desktop Table View (>= md) */}
+                    <div className="hidden md:block overflow-x-auto">
                         <table className="w-full text-left">
                             <thead className="bg-gray-800/50 text-gray-400 text-xs uppercase tracking-wider font-semibold">
                                 <tr>
-                                    <th className="p-5">User</th>
-                                    <th className="p-5">Role</th>
-                                    <th className="p-5">Joined</th>
-                                    <th className="p-5">Last Active</th>
-                                    <th className="p-5 text-right">Actions</th>
+                                    <th className="p-4 lg:p-6">User</th>
+                                    <th className="p-4 lg:p-6">Role</th>
+                                    <th className="p-4 lg:p-6">Joined</th>
+                                    <th className="p-4 lg:p-6">Last Active</th>
+                                    <th className="p-4 lg:p-6 text-right">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-800/50">
                                 {filteredUsers.length > 0 ? (
                                     filteredUsers.map(user => (
                                         <tr key={user._id} className="hover:bg-blue-500/5 transition-colors group">
-                                            <td className="p-5">
+                                            <td className="p-4 lg:p-6">
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center text-sm font-bold text-white border border-gray-600">
                                                         {user.profilePic ? (
@@ -214,7 +273,7 @@ export default function AdminDashboard() {
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="p-5">
+                                            <td className="p-4 lg:p-6">
                                                 {user.isAdmin ? (
                                                     <span className="px-2 py-1 rounded-full bg-purple-500/20 text-purple-300 text-xs font-bold border border-purple-500/30">
                                                         Admin
@@ -225,17 +284,17 @@ export default function AdminDashboard() {
                                                     </span>
                                                 )}
                                             </td>
-                                            <td className="p-5 text-sm text-gray-400">
+                                            <td className="p-4 lg:p-6 text-sm text-gray-400">
                                                 {new Date(user.createdAt).toLocaleDateString()}
                                             </td>
-                                            <td className="p-5 text-sm">
+                                            <td className="p-4 lg:p-6 text-sm">
                                                 {user.lastLogin ? (
                                                     <span className="text-green-400 font-medium">{new Date(user.lastLogin).toLocaleString()}</span>
                                                 ) : (
                                                     <span className="text-gray-600 italic">Never</span>
                                                 )}
                                             </td>
-                                            <td className="p-5 text-right">
+                                            <td className="p-4 lg:p-6 text-right">
                                                 {!user.isAdmin && (
                                                     <button
                                                         onClick={() => initiateDelete(user._id)}

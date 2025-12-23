@@ -286,7 +286,7 @@ export default function Chat() {
                             ) : (
                                 <span>{partner?.name?.charAt(0).toUpperCase() || 'C'}</span>
                             )}
-                            <div className="absolute bottom-0 right-0 w-2.5 h-2.5 md:w-3 md:h-3 bg-green-500 border-2 border-white dark:border-gray-900 rounded-full"></div>
+                            <div className={`absolute bottom-0 right-0 w-2.5 h-2.5 md:w-3 md:h-3 border-2 border-white dark:border-gray-900 rounded-full ${partnerStatus === 'online' ? 'bg-green-500' : 'bg-gray-400'}`}></div>
                         </div>
                         <div className="min-w-0">
                             <h1 className="text-base md:text-lg font-bold text-gray-900 dark:text-white leading-tight truncate max-w-[120px] sm:max-w-[200px] md:max-w-none">

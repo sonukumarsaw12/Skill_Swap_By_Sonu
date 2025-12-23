@@ -179,11 +179,30 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ socket, user, receiverId, onClo
 
     const downloadBoard = () => {
         if (!canvasRef.current) return;
-        const link = document.createElement('a');
-        link.download = `whiteboard-${Date.now()}.png`;
-        link.href = canvasRef.current.toDataURL();
-        link.click();
+
+        // Create a temporary canvas to handle background
+        const canvas = canvasRef.current;
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height;
+        const ctx = tempCanvas.getContext('2d');
+
+        if (ctx) {
+            // Fill white background
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+            // Draw original canvas on top
+            ctx.drawImage(canvas, 0, 0);
+
+            const link = document.createElement('a');
+            link.download = `whiteboard-${Date.now()}.jpg`;
+            link.href = tempCanvas.toDataURL('image/jpeg', 0.9); // 0.9 quality
+            link.click();
+        }
     };
+
+    // Track last touch position for shape finalization
+    const lastTouchPos = useRef<{ x: number, y: number } | null>(null);
 
     // Performance: Throttle socket events to ~60fps
     const lastEmit = useRef<number>(0);
@@ -351,7 +370,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ socket, user, receiverId, onClo
     };
 
     const handleTouchStart = (e: React.TouchEvent) => {
-        e.preventDefault();
+        // e.preventDefault(); // Removed to fix passive listener error, relying on touch-action: none
         if (!canvasRef.current) return;
         const touch = e.touches[0];
         const rect = canvasRef.current.getBoundingClientRect();
@@ -359,6 +378,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ socket, user, receiverId, onClo
         const offsetY = touch.clientY - rect.top;
 
         startPos.current = { x: offsetX, y: offsetY };
+        lastTouchPos.current = { x: offsetX, y: offsetY }; // Track initial touch
         socketPrev.current = { x: offsetX, y: offsetY };
         setIsDrawing(true);
         lastEmit.current = Date.now();
@@ -391,13 +411,15 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ socket, user, receiverId, onClo
     };
 
     const handleTouchMove = (e: React.TouchEvent) => {
-        e.preventDefault();
+        // e.preventDefault(); // Removed to fix passive listener error
         if (!isDrawing || !startPos.current || !contextRef.current || !canvasRef.current) return;
 
         const touch = e.touches[0];
         const rect = canvasRef.current.getBoundingClientRect();
         const offsetX = touch.clientX - rect.left;
         const offsetY = touch.clientY - rect.top;
+
+        lastTouchPos.current = { x: offsetX, y: offsetY }; // Update last known pos
 
         const ctx = contextRef.current;
         const now = Date.now();
@@ -446,25 +468,49 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ socket, user, receiverId, onClo
     };
 
     const handleTouchEnd = (e: React.TouchEvent) => {
-        e.preventDefault();
+        // e.preventDefault(); // Removed
         if (!isDrawing) return;
         setIsDrawing(false);
 
-        // For shapes, we need the last touch position. 
-        // Since 'touchend' has no touches list for the ended touch, we rely on the last move's position 
-        // stored in startPos (which is updated in move for pen, but NOT for shapes).
-        // WAIT: For shapes, startPos is FIXED at the start. loading 'offsetX' from event is hard in touchend.
-        // Simplified strategy: We track the "last known current position" in a ref or similar if we strictly needed shape drawing on mobile.
-        // However, for PEN (most important), logic is fine. 
-        // For SHAPES on mobile: It's tricky without a 'lastMove' var. 
-        // Let's assume for this fix, we primarily care about PEN/ERASER working which is 99% of mobile usage.
+        // Finalize Shape Emit using lastTouchPos
+        if (tool !== 'pen' && tool !== 'eraser' && startPos.current && tool !== 'text' && lastTouchPos.current) {
+            const offsetX = lastTouchPos.current.x;
+            const offsetY = lastTouchPos.current.y;
 
-        // Actually, let's just properly handle it by reusing the last known position.
-        // But for time being, let's just finalize the stroke.
+            // Emit shape command
+            let shapeData: any = {
+                receiverId,
+                type: 'shape',
+                color,
+                width: lineWidth
+            };
+
+            if (tool === 'rect') {
+                shapeData.shape = 'rect';
+                shapeData.x = startPos.current.x;
+                shapeData.y = startPos.current.y;
+                shapeData.w = offsetX - startPos.current.x;
+                shapeData.h = offsetY - startPos.current.y;
+            } else if (tool === 'circle') {
+                shapeData.shape = 'circle';
+                shapeData.currX = startPos.current.x;
+                shapeData.currY = startPos.current.y;
+                shapeData.radius = Math.sqrt(Math.pow(offsetX - startPos.current.x, 2) + Math.pow(offsetY - startPos.current.y, 2));
+            } else if (tool === 'line') {
+                shapeData.shape = 'straight_line';
+                shapeData.startX = startPos.current.x;
+                shapeData.startY = startPos.current.y;
+                shapeData.endX = offsetX;
+                shapeData.endY = offsetY;
+            }
+
+            socket.emit("draw", shapeData);
+        }
 
         saveHistory();
         startPos.current = null;
         snapshot.current = null;
+        lastTouchPos.current = null;
     };
 
 
@@ -540,6 +586,10 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ socket, user, receiverId, onClo
 
                             <button onClick={clearBoard} className="text-red-500 active:text-red-700">
                                 <Trash2 size={20} />
+                            </button>
+
+                            <button onClick={downloadBoard} className="text-indigo-600 active:text-indigo-800">
+                                <Download size={20} />
                             </button>
 
                             <button onClick={onClose} className="p-1.5 bg-gray-100 rounded-full text-gray-600 active:bg-gray-200 ml-2">
@@ -630,7 +680,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ socket, user, receiverId, onClo
                         onTouchMove={handleTouchMove}
                         onTouchEnd={handleTouchEnd}
                         className="block w-full h-full touch-none"
-                        style={{ cursor: getCursorStyle() }}
+                        style={{ cursor: getCursorStyle(), touchAction: 'none' }}
                     />
                 </div>
             </div>

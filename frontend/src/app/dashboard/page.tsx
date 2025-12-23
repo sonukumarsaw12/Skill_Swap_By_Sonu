@@ -19,7 +19,11 @@ export default function Dashboard() {
     const [requests, setRequests] = useState<any[]>([]);
     const [connections, setConnections] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
-    const [activeCallPartner, setActiveCallPartner] = useState<string | null>(null);
+    const [activeCall, setActiveCall] = useState<{
+        partnerId: string;
+        partnerName: string;
+        meetingId?: string;
+    } | null>(null);
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error'; isVisible: boolean }>({
         message: '',
         type: 'success',
@@ -274,7 +278,13 @@ export default function Dashboard() {
                         {/* Upcoming Meetings Card */}
                         <div className="group bg-white/70 dark:bg-gray-800/60 backdrop-blur-xl p-1 rounded-[2rem] shadow-xl shadow-indigo-500/5 border border-white/60 dark:border-gray-700/60 transition-all hover:shadow-2xl hover:shadow-indigo-500/10 hover:-translate-y-1">
                             <div className="bg-gradient-to-br from-white/50 to-white/20 dark:from-gray-800/50 dark:to-gray-800/20 p-6 rounded-[1.8rem] h-full">
-                                <DashboardMeetings onJoinCall={(partnerId) => setActiveCallPartner(partnerId)} />
+                                <DashboardMeetings onJoinCall={(partnerId, meetingId, partnerName) => {
+                                    setActiveCall({
+                                        partnerId,
+                                        meetingId,
+                                        partnerName
+                                    });
+                                }} />
                             </div>
                         </div>
 
@@ -289,7 +299,7 @@ export default function Dashboard() {
                                 </Link>
                             </div>
 
-                            <div className="space-y-6">
+                            <div className="space-y-6 max-h-[320px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
                                 <div>
                                     <h3 className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3">Teaching</h3>
                                     <div className="flex flex-wrap gap-2">
@@ -328,7 +338,7 @@ export default function Dashboard() {
                                 <MessageCircle className="w-5 h-5 text-blue-500" /> Connections
                             </h2>
                             {connections.length === 0 ? <p className="text-gray-400 text-sm">No connections yet.</p> : (
-                                <ul className="space-y-3">
+                                <ul className="space-y-3 max-h-[320px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
                                     {connections.map((conn) => {
                                         const partner = conn.sender._id === user._id ? conn.receiver : conn.sender;
                                         return (
@@ -368,7 +378,7 @@ export default function Dashboard() {
                             </h2>
 
                             {requests.length > 0 ? (
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[240px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-orange-200 dark:scrollbar-thumb-orange-800 scrollbar-track-transparent">
                                     {requests.map((req) => (
                                         <div key={req._id} className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex justify-between items-center">
                                             <div>
@@ -540,12 +550,14 @@ export default function Dashboard() {
             </div>
 
             {/* Video Call Overlay */}
-            {activeCallPartner && user && socket && (
+            {activeCall && user && socket && (
                 <VideoCall
                     socket={socket}
                     user={user}
-                    partnerId={activeCallPartner}
-                    onClose={() => setActiveCallPartner(null)}
+                    partnerId={activeCall.partnerId}
+                    meetingId={activeCall.meetingId}
+                    partnerName={activeCall.partnerName}
+                    onClose={() => setActiveCall(null)}
                 />
             )}
 
