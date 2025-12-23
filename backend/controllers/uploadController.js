@@ -1,36 +1,35 @@
 const mult = require('multer');
-const path = require('path');
+const { v2: cloudinary } = require('cloudinary');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const dotenv = require('dotenv');
 
-const storage = mult.diskStorage({
-    destination(req, file, cb) {
-        cb(null, 'uploads/');
-    },
-    filename(req, file, cb) {
-        cb(null, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
+dotenv.config();
+
+// Configure Cloudinary
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// Configure Storage
+const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: 'skill_swap_avatars', // Folder name in Cloudinary
+        allowed_formats: ['jpg', 'png', 'jpeg'],
+        transformation: [{ width: 500, height: 500, crop: 'limit' }], // Optional resize
     },
 });
 
-function checkFileType(file, cb) {
-    const filetypes = /jpg|jpeg|png|pdf|doc|docx/;
-    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = filetypes.test(file.mimetype);
-
-    if (extname && mimetype) {
-        return cb(null, true);
-    } else {
-        cb('Images and Documents only!');
-    }
-}
-
-const upload = mult({
-    storage,
-    fileFilter: function (req, file, cb) {
-        checkFileType(file, cb);
-    },
-});
+const upload = mult({ storage: storage });
 
 const uploadFile = (req, res) => {
-    res.send(`/${req.file.path.replace(/\\/g, "/")}`);
+    // Cloudinary returns the URL in req.file.path
+    if (!req.file) {
+        return res.status(400).send('No file uploaded.');
+    }
+    res.send(req.file.path);
 };
 
 module.exports = { upload, uploadFile };
