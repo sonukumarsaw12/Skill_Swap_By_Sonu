@@ -74,9 +74,10 @@ export default function Profile() {
 
             if (res.ok) {
                 const data = await res.text();
-                // backend returns path like /uploads/image.jpg
-                // We construct full URL. 
-                const fullUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}${data}`;
+                // Check if backend returned a full Cloudinary URL or a local path
+                const fullUrl = data.startsWith('http')
+                    ? data
+                    : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}${data}`;
                 setFormData((prev) => ({ ...prev, profilePic: fullUrl }));
                 showToast('Profile picture uploaded!', 'success');
             } else {
