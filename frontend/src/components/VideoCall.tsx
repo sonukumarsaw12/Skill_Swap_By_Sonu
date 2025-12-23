@@ -182,6 +182,14 @@ const VideoCall: React.FC<VideoCallProps> = ({ socket, user, partnerId, onClose,
         }
     }, [remoteStream, callAccepted]);
 
+    // Local Video Rendering (Fix for PiP black screen)
+    useEffect(() => {
+        if (myVideo.current && stream) {
+            console.log("🎥 Assigning local stream to video element via Effect");
+            myVideo.current.srcObject = stream;
+        }
+    }, [stream]);
+
     // Derived State for Whiteboard Receiver
     // If I am receiving a call, I send data to 'caller'.
     // If I initiated the call, I send data to 'partnerId'.
