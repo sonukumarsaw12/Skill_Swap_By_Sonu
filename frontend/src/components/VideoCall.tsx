@@ -31,7 +31,18 @@ const VideoCall: React.FC<VideoCallProps> = ({ socket, user, partnerId, onClose,
     const [isWhiteboardOpen, setIsWhiteboardOpen] = useState(false);
 
     // Draggable PiP Logic
-    const [pipPosition, setPipPosition] = useState({ x: typeof window !== 'undefined' ? window.innerWidth - 320 : 800, y: 100 });
+    const [pipPosition, setPipPosition] = useState(() => {
+        if (typeof window !== 'undefined') {
+            const isMobile = window.innerWidth < 768;
+            // Mobile: Top-Right (w-32 = 128px) | Desktop: Right (w-72 = 288px)
+            return {
+                x: isMobile ? window.innerWidth - 144 : window.innerWidth - 320,
+                y: isMobile ? 80 : 100
+            };
+        }
+        return { x: 800, y: 100 };
+    });
+
     const isDragging = useRef(false);
     const dragOffset = useRef({ x: 0, y: 0 });
 
@@ -55,6 +66,31 @@ const VideoCall: React.FC<VideoCallProps> = ({ socket, user, partnerId, onClose,
     const handleMouseUp = () => {
         isDragging.current = false;
     };
+
+    // Add Touch Handlers for Mobile Dragging
+    const handleTouchStart = (e: React.TouchEvent) => {
+        isDragging.current = true;
+        const touch = e.touches[0];
+        dragOffset.current = {
+            x: touch.clientX - pipPosition.x,
+            y: touch.clientY - pipPosition.y
+        };
+    };
+
+    const handleTouchMove = (e: React.TouchEvent) => {
+        if (isDragging.current) {
+            const touch = e.touches[0];
+            setPipPosition({
+                x: touch.clientX - dragOffset.current.x,
+                y: touch.clientY - dragOffset.current.y
+            });
+        }
+    };
+
+    const handleTouchEnd = () => {
+        isDragging.current = false;
+    };
+
 
     const partnerVideo = useRef<HTMLVideoElement>(null);
 
@@ -558,8 +594,12 @@ const VideoCall: React.FC<VideoCallProps> = ({ socket, user, partnerId, onClose,
                         onMouseMove={handleMouseMove}
                         onMouseUp={handleMouseUp}
                         onMouseLeave={handleMouseUp}
+                        // Add touch listeners for mobile drag
+                        onTouchStart={handleTouchStart}
+                        onTouchMove={handleTouchMove}
+                        onTouchEnd={handleTouchEnd}
                         style={{ left: pipPosition.x, top: pipPosition.y }}
-                        className="fixed w-72 aspect-video bg-gray-900 rounded-2xl overflow-hidden shadow-2xl border-2 border-indigo-500/30 z-50 cursor-move hover:shadow-indigo-500/40 transition-shadow active:scale-95 duration-200"
+                        className="fixed w-32 md:w-72 aspect-video bg-gray-900 rounded-xl md:rounded-2xl overflow-hidden shadow-2xl border-2 border-indigo-500/30 z-50 cursor-move hover:shadow-indigo-500/40 transition-shadow active:scale-95 duration-200"
                     >
                         <video
                             playsInline
@@ -568,41 +608,8 @@ const VideoCall: React.FC<VideoCallProps> = ({ socket, user, partnerId, onClose,
                             muted
                             className="w-full h-full object-cover pointer-events-none"
                         />
-                        <div className="absolute top-2 right-2">
-                            <span className="bg-indigo-600 text-white text-[10px] px-2 py-0.5 rounded shadow">Partner</span>
-                        </div>
-                    </div>
-                )}
-
-                {/* Incoming Call Overlay */}
-                {receivingCall && !callAccepted && (
-                    <div className="absolute inset-0 bg-black/90 backdrop-blur-md flex flex-col items-center justify-center text-white z-50 animate-in fade-in duration-300">
-                        <div className="w-24 h-24 bg-indigo-500 rounded-full flex items-center justify-center mb-6 animate-bounce shadow-lg shadow-indigo-500/50">
-                            <Phone className="w-10 h-10 fill-current" />
-                        </div>
-                        <div className="text-3xl font-bold mb-2">{name}</div>
-                        <div className="text-indigo-300 mb-10 animate-pulse">Incoming Video Call...</div>
-
-                        <div className="flex gap-8">
-                            <button
-                                onClick={answerCall}
-                                className="group flex flex-col items-center gap-2"
-                            >
-                                <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center shadow-lg shadow-green-500/30 transition-transform group-hover:scale-110 group-active:scale-95">
-                                    <Phone className="w-8 h-8 fill-current" />
-                                </div>
-                                <span className="text-sm font-medium text-green-400">Answer</span>
-                            </button>
-
-                            <button
-                                onClick={leaveCall}
-                                className="group flex flex-col items-center gap-2"
-                            >
-                                <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center shadow-lg shadow-red-500/30 transition-transform group-hover:scale-110 group-active:scale-95">
-                                    <Phone className="w-8 h-8 fill-current transform rotate-[135deg]" />
-                                </div>
-                                <span className="text-sm font-medium text-red-400">Decline</span>
-                            </button>
+                        <div className="absolute top-1 right-1 md:top-2 md:right-2">
+                            <span className="bg-indigo-600 text-white text-[8px] md:text-[10px] px-1.5 py-0.5 rounded shadow">Partner</span>
                         </div>
                     </div>
                 )}
