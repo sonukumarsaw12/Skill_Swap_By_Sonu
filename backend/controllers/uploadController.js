@@ -6,6 +6,11 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 // Configure Cloudinary
+console.log("Cloudinary Config Check:");
+console.log("Cloud Name:", process.env.CLOUDINARY_CLOUD_NAME ? "Exists" : "MISSING");
+console.log("API Key:", process.env.CLOUDINARY_API_KEY ? "Exists" : "MISSING");
+console.log("API Secret:", process.env.CLOUDINARY_API_SECRET ? "Exists" : "MISSING");
+
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
@@ -16,9 +21,8 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
-        folder: 'skill_swap_avatars', // Folder name in Cloudinary
-        allowed_formats: ['jpg', 'png', 'jpeg'],
-        transformation: [{ width: 500, height: 500, crop: 'limit' }], // Optional resize
+        folder: 'skill_swap_avatars',
+        resource_type: 'auto', // Allow any image type
     },
 });
 
