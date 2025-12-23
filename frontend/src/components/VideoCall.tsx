@@ -29,6 +29,8 @@ const VideoCall: React.FC<VideoCallProps> = ({ socket, user, partnerId, onClose,
     const [name, setName] = useState("");
     const [localScreenStream, setLocalScreenStream] = useState<MediaStream | null>(null);
     const [isWhiteboardOpen, setIsWhiteboardOpen] = useState(false);
+    const [isAudioMuted, setIsAudioMuted] = useState(false);
+    const [isScreenSharing, setIsScreenSharing] = useState(false);
 
     // Draggable Partner PiP Logic
     const [pipPosition, setPipPosition] = useState(() => {
@@ -118,7 +120,7 @@ const VideoCall: React.FC<VideoCallProps> = ({ socket, user, partnerId, onClose,
     const handleScreenShare = () => { }; // Needs implementation
     const leaveCall = () => onClose();
     const callUser = (id: string) => { }; // Needs implementation
-    const isScreenSharing = false;
+
 
     // ... (Dependencies for effects would go here)
 
