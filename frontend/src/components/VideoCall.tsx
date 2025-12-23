@@ -567,7 +567,7 @@ const VideoCall: React.FC<VideoCallProps> = ({ socket, user, partnerId, onClose,
 
                 {/* My Video (PiP) */}
                 {stream && (
-                    <div className="absolute top-6 right-6 w-64 aspect-video bg-gray-900/90 rounded-2xl overflow-hidden shadow-2xl border border-white/20 transition-all duration-300 hover:scale-105 hover:border-indigo-500/50 hover:shadow-indigo-500/20 z-50 group/pip">
+                    <div className="absolute top-6 right-6 w-32 md:w-64 aspect-video bg-gray-900/90 rounded-2xl overflow-hidden shadow-2xl border border-white/20 transition-all duration-300 hover:scale-105 hover:border-indigo-500/50 hover:shadow-indigo-500/20 z-50 group/pip">
                         <video
                             playsInline
                             muted
@@ -580,9 +580,9 @@ const VideoCall: React.FC<VideoCallProps> = ({ socket, user, partnerId, onClose,
                                 <VideoOff className="w-8 h-8 opacity-50" />
                             </div>
                         )}
-                        <div className="absolute bottom-3 left-3 flex items-center gap-2 bg-black/60 px-3 py-1 rounded-full backdrop-blur-md border border-white/10">
-                            <div className={`w-2 h-2 rounded-full animate-pulse ${isAudioMuted ? 'bg-red-500' : 'bg-green-500'}`}></div>
-                            <span className="text-xs text-white font-medium tracking-wide">You</span>
+                        <div className="absolute bottom-2 left-2 md:bottom-3 md:left-3 flex items-center gap-1 md:gap-2 bg-black/60 px-2 py-0.5 md:px-3 md:py-1 rounded-full backdrop-blur-md border border-white/10">
+                            <div className={`w-1.5 h-1.5 md:w-2 md:h-2 rounded-full animate-pulse ${isAudioMuted ? 'bg-red-500' : 'bg-green-500'}`}></div>
+                            <span className="text-[10px] md:text-xs text-white font-medium tracking-wide">You</span>
                         </div>
                     </div>
                 )}
