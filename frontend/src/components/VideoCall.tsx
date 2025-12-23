@@ -251,6 +251,12 @@ const VideoCall: React.FC<VideoCallProps> = ({ socket, user, partnerId, onClose,
             initiator: true,
             trickle: false,
             stream: stream!,
+            config: {
+                iceServers: [
+                    { urls: 'stun:stun.l.google.com:19302' },
+                    { urls: 'stun:global.stun.twilio.com:3478' }
+                ]
+            }
         });
 
         peer.on("signal", (data) => {
@@ -291,6 +297,12 @@ const VideoCall: React.FC<VideoCallProps> = ({ socket, user, partnerId, onClose,
             initiator: false,
             trickle: false,
             stream: stream!,
+            config: {
+                iceServers: [
+                    { urls: 'stun:stun.l.google.com:19302' },
+                    { urls: 'stun:global.stun.twilio.com:3478' }
+                ]
+            }
         });
 
         peer.on("signal", (data) => {
