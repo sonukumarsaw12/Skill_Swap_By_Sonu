@@ -1,4 +1,4 @@
-# 🔄 Skill Swap
+<img width="2879" height="1621" alt="Screenshot 2025-12-27 175502" src="https://github.com/user-attachments/assets/c63f22f1-3b6a-4b71-a8f1-5245bffcec7d" /><img width="2879" height="1621" alt="Screenshot 2025-12-27 175502" src="https://github.com/user-attachments/assets/3946cad6-6b56-4d01-9a30-ea36c5a4dba3" /># 🔄 Skill Swap
 
 ![MERN Stack](https://img.shields.io/badge/MERN-Stack-000000?style=for-the-badge&logo=mongodb&logoColor=green)
 ![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white)
@@ -140,8 +140,7 @@ The app should now be running at `http://localhost:3000`.
 
 ---
 ## Screenshot
-<img width="2879" height="1621" alt="Screenshot 2025-12-27 175502" src="https://github.com/user-att<img width="2863" height="1619" alt="Screenshot 2025-12-27 175547" src="https://github.com/user-attachments/assets/de338851-c294-4491-9e17-08ce80fde39d" />
-achments/assets/1c98d725-7995-498b-80a6-c4168dcc9979" />
+<img width="2879" height="1621" alt="Screenshot 2025-12-27 175502" src="https://github.com/user-attachments/assets/5df8d888-9726-4877-87aa-7f43ec8480b9" />
 <img width="2615" height="1479" alt="Screenshot 2025-12-27 175603" src="https://github.com/user-attachments/assets/45131041-349d-4601-b899-f0c5158985a4" />
 <img width="2825" height="1621" alt="Screenshot 2025-12-27 175620" src="https://github.com/user-attachments/assets/c8f7540e-095c-43c7-9a7f-35c5a5efc796" />
 <img width="2879" height="1626" alt="Screenshot 2025-12-27 175638" src="https://github.com/user-attachments/assets/0c711cc6-7749-440b-b8e5-394ef0fd0698" />
