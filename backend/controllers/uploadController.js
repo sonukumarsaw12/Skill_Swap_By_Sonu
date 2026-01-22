@@ -20,9 +20,24 @@ cloudinary.config({
 // Configure Storage
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
-    params: {
-        folder: 'skill_swap_avatars',
-        resource_type: 'auto', // Allow any image type
+    params: async (req, file) => {
+        // Check if file is image based on mimetype
+        const isImage = file.mimetype.startsWith('image');
+        // Extract plain filename without extension
+        const originalName = file.originalname.replace(/\.[^/.]+$/, "").replace(/\s+/g, "_");
+        // Extract extension
+        const ext = file.originalname.split('.').pop();
+
+        return {
+            folder: 'skill_swap_avatars',
+            resource_type: isImage ? 'image' : 'raw',
+            access_mode: 'public', // Explicitly request public access
+            type: 'upload',        // Standard upload type
+            // For non-image files (Raw), we MUST append extension to public_id 
+            // so the URL ends in .docx/.zip etc.
+            // For images, Cloudinary handles it.
+            public_id: `${originalName}_${Date.now()}${isImage ? '' : `.${ext}`}`,
+        };
     },
 });
 

@@ -255,6 +255,29 @@ export default function Chat() {
         }
     };
 
+
+
+    const handleDownload = async (url: string, filename: string) => {
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error("Download failed");
+
+            const blob = await response.blob();
+            const blobUrl = window.URL.createObjectURL(blob);
+
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            link.download = filename || 'downloaded-file';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(blobUrl);
+        } catch (error) {
+            console.error("Download failed, falling back to open:", error);
+            window.open(url, '_blank');
+        }
+    };
+
     if (!user) return (
         <div className="min-h-screen bg-gray-50 dark:bg-black flex flex-col items-center justify-center space-y-4">
             <div className="w-16 h-16 rounded-full border-4 border-indigo-500 border-t-transparent animate-spin"></div>
@@ -475,15 +498,25 @@ export default function Chat() {
                             {msg.fileUrl ? (
                                 msg.fileUrl.match(/\.(jpeg|jpg|png|gif)$/i) ? (
                                     <div className="mb-1 rounded-xl overflow-hidden border border-white/20">
-                                        <img src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}${msg.fileUrl}`} alt="shared" className="max-w-full h-auto object-cover" />
+                                        <img
+                                            src={msg.fileUrl.startsWith('http') ? msg.fileUrl : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}${msg.fileUrl}`}
+                                            alt="shared"
+                                            className="max-w-full h-auto object-cover"
+                                        />
                                     </div>
                                 ) : (
-                                    <a href={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}${msg.fileUrl}`} target="_blank" rel="noreferrer" className="flex items-center gap-3 p-3 bg-black/10 dark:bg-white/10 rounded-xl hover:bg-black/20 transition mb-1">
+                                    <button
+                                        onClick={() => handleDownload(
+                                            msg.fileUrl.startsWith('http') ? msg.fileUrl : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}${msg.fileUrl}`,
+                                            msg.message
+                                        )}
+                                        className="flex items-center gap-3 p-3 bg-black/10 dark:bg-white/10 rounded-xl hover:bg-black/20 transition mb-1 text-left w-full"
+                                    >
                                         <div className="p-2 bg-white dark:bg-gray-900 rounded-lg flex-shrink-0">
                                             <Paperclip className="w-5 h-5 text-indigo-500" />
                                         </div>
                                         <span className="text-sm font-medium underline decoration-dotted truncate underline-offset-2 break-all">{msg.message || 'Attached File'}</span>
-                                    </a>
+                                    </button>
                                 )
                             ) : (
                                 <p className="text-sm md:text-[15px] leading-relaxed tracking-wide break-words whitespace-pre-wrap pr-4">{msg.message}</p>
