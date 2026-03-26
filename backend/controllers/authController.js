@@ -62,30 +62,33 @@ const registerUser = async (req, res) => {
         }
 
         if (pendingUser) {
-                // Send OTP Email (Reverting to awaited to ensure delivery on Render)
+                // Start sending email in background (Fast Response)
                 const message = `Your verification code is: ${otp}. It will expire in 10 minutes.`;
-                try {
-                    await sendEmail({
-                        email: pendingUser.email,
-                        subject: 'Email Verification OTP',
-                        message,
-                        html: `
-                            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e1e1e1; border-radius: 10px;">
-                                <h2 style="color: #4f46e5; text-align: center;">Welcome to SkillSwap!</h2>
-                                <p>Thank you for signing up. Please use the following One-Time Password (OTP) to verify your email address:</p>
-                                <div style="background-color: #f3f4f6; padding: 20px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #1f2937; border-radius: 8px; margin: 20px 0;">
-                                    ${otp}
+                setImmediate(async () => {
+                    try {
+                        console.log(`Background: Sending signup OTP to ${pendingUser.email}`);
+                        await sendEmail({
+                            email: pendingUser.email,
+                            subject: 'Email Verification OTP',
+                            message,
+                            html: `
+                                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e1e1e1; border-radius: 10px;">
+                                    <h2 style="color: #4f46e5; text-align: center;">Welcome to SkillSwap!</h2>
+                                    <p>Thank you for signing up. Please use the following One-Time Password (OTP) to verify your email address:</p>
+                                    <div style="background-color: #f3f4f6; padding: 20px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #1f2937; border-radius: 8px; margin: 20px 0;">
+                                        ${otp}
+                                    </div>
+                                    <p>This code will expire in <strong>10 minutes</strong>.</p>
+                                    <p>If you didn't request this, please ignore this email.</p>
+                                    <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+                                    <p style="font-size: 12px; color: #6b7280; text-align: center;">&copy; 2024 SkillSwap. All rights reserved.</p>
                                 </div>
-                                <p>This code will expire in <strong>10 minutes</strong>.</p>
-                                <p>If you didn't request this, please ignore this email.</p>
-                                <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
-                                <p style="font-size: 12px; color: #6b7280; text-align: center;">&copy; 2024 SkillSwap. All rights reserved.</p>
-                            </div>
-                        `,
-                    });
-                } catch (err) {
-                    console.error("Email send error recorded:", err);
-                }
+                            `,
+                        });
+                    } catch (err) {
+                        console.error("Background Email Error (Signup):", err);
+                    }
+                });
 
                 res.status(201).json({
                     message: 'OTP sent to email. Please verify.',
@@ -122,29 +125,32 @@ const loginUser = async (req, res) => {
             user.otpExpires = otpExpires;
             await user.save();
 
-            // Send OTP Email (Reverting to awaited to ensure delivery on Render)
+            // Start sending email in background (Fast Response)
             const message = `Your login verification code is: ${otp}. It will expire in 10 minutes.`;
-            try {
-                await sendEmail({
-                    email: user.email,
-                    subject: 'Login Verification OTP',
-                    message,
-                    html: `
-                        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e1e1e1; border-radius: 10px;">
-                            <h2 style="color: #4f46e5; text-align: center;">SkillSwap Login</h2>
-                            <p>You are trying to log in. Please use the following One-Time Password (OTP) to verify your identity:</p>
-                            <div style="background-color: #f3f4f6; padding: 20px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #1f2937; border-radius: 8px; margin: 20px 0;">
-                                ${otp}
+            setImmediate(async () => {
+                try {
+                    console.log(`Background: Sending login OTP to ${user.email}`);
+                    await sendEmail({
+                        email: user.email,
+                        subject: 'Login Verification OTP',
+                        message,
+                        html: `
+                            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e1e1e1; border-radius: 10px;">
+                                <h2 style="color: #4f46e5; text-align: center;">SkillSwap Login</h2>
+                                <p>You are trying to log in. Please use the following One-Time Password (OTP) to verify your identity:</p>
+                                <div style="background-color: #f3f4f6; padding: 20px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #1f2937; border-radius: 8px; margin: 20px 0;">
+                                    ${otp}
+                                </div>
+                                <p>This code will expire in <strong>10 minutes</strong>.</p>
+                                <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+                                <p style="font-size: 12px; color: #6b7280; text-align: center;">&copy; 2024 SkillSwap. All rights reserved.</p>
                             </div>
-                            <p>This code will expire in <strong>10 minutes</strong>.</p>
-                            <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
-                            <p style="font-size: 12px; color: #6b7280; text-align: center;">&copy; 2024 SkillSwap. All rights reserved.</p>
-                        </div>
-                    `,
-                });
-            } catch (err) {
-                console.error("Email send error recorded:", err);
-            }
+                        `,
+                    });
+                } catch (err) {
+                    console.error("Background Email Error (Login):", err);
+                }
+            });
 
             return res.status(200).json({
                 message: 'OTP sent to email for login verification',
