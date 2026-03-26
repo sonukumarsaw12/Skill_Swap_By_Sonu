@@ -62,10 +62,9 @@ const registerUser = async (req, res) => {
         }
 
         if (pendingUser) {
-            // Send OTP Email
-            const message = `Your verification code is: ${otp}. It will expire in 10 minutes.`;
-            try {
-                await sendEmail({
+                // Send OTP Email (Non-blocking to improve response time)
+                const message = `Your verification code is: ${otp}. It will expire in 10 minutes.`;
+                sendEmail({
                     email: pendingUser.email,
                     subject: 'Email Verification OTP',
                     message,
@@ -82,17 +81,13 @@ const registerUser = async (req, res) => {
                             <p style="font-size: 12px; color: #6b7280; text-align: center;">&copy; 2024 SkillSwap. All rights reserved.</p>
                         </div>
                     `,
-                });
+                }).catch(err => console.error("Email send error:", err));
 
                 res.status(201).json({
                     message: 'OTP sent to email. Please verify.',
                     email: pendingUser.email,
                     unverified: true
                 });
-            } catch (error) {
-                console.error("Email send error:", error);
-                res.status(500).json({ message: 'Error sending verification email' });
-            }
         } else {
             res.status(400).json({ message: 'Invalid user data' });
         }
@@ -123,36 +118,31 @@ const loginUser = async (req, res) => {
             user.otpExpires = otpExpires;
             await user.save();
 
-            // Send OTP Email
+            // Send OTP Email (Non-blocking to improve response time)
             const message = `Your login verification code is: ${otp}. It will expire in 10 minutes.`;
-            try {
-                await sendEmail({
-                    email: user.email,
-                    subject: 'Login Verification OTP',
-                    message,
-                    html: `
-                        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e1e1e1; border-radius: 10px;">
-                            <h2 style="color: #4f46e5; text-align: center;">SkillSwap Login</h2>
-                            <p>You are trying to log in. Please use the following One-Time Password (OTP) to verify your identity:</p>
-                            <div style="background-color: #f3f4f6; padding: 20px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #1f2937; border-radius: 8px; margin: 20px 0;">
-                                ${otp}
-                            </div>
-                            <p>This code will expire in <strong>10 minutes</strong>.</p>
-                            <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
-                            <p style="font-size: 12px; color: #6b7280; text-align: center;">&copy; 2024 SkillSwap. All rights reserved.</p>
+            sendEmail({
+                email: user.email,
+                subject: 'Login Verification OTP',
+                message,
+                html: `
+                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e1e1e1; border-radius: 10px;">
+                        <h2 style="color: #4f46e5; text-align: center;">SkillSwap Login</h2>
+                        <p>You are trying to log in. Please use the following One-Time Password (OTP) to verify your identity:</p>
+                        <div style="background-color: #f3f4f6; padding: 20px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #1f2937; border-radius: 8px; margin: 20px 0;">
+                            ${otp}
                         </div>
-                    `,
-                });
+                        <p>This code will expire in <strong>10 minutes</strong>.</p>
+                        <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+                        <p style="font-size: 12px; color: #6b7280; text-align: center;">&copy; 2024 SkillSwap. All rights reserved.</p>
+                    </div>
+                `,
+            }).catch(err => console.error("Email send error:", err));
 
-                return res.status(200).json({
-                    message: 'OTP sent to email for login verification',
-                    email: user.email,
-                    requiresOtp: true
-                });
-            } catch (error) {
-                console.error("Email send error:", error);
-                return res.status(500).json({ message: 'Error sending verification email' });
-            }
+            return res.status(200).json({
+                message: 'OTP sent to email for login verification',
+                email: user.email,
+                requiresOtp: true
+            });
         } else {
             res.status(400).json({ message: 'Invalid credentials' });
         }

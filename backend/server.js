@@ -4,6 +4,7 @@ const cors = require('cors');
 const connectDB = require('./config/db');
 const { Server } = require('socket.io');
 const http = require('http');
+const https = require('https');
 
 dotenv.config();
 
@@ -193,4 +194,18 @@ const PORT = process.env.PORT || 5000;
 
 server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
+    
+    // Self-ping logic to prevent Render from sleeping (free tier)
+    const backendUrl = process.env.BACKEND_URL;
+    if (backendUrl) {
+        console.log(`Self-pinging enabled for: ${backendUrl}`);
+        setInterval(() => {
+            const protocol = backendUrl.startsWith('https') ? https : http;
+            protocol.get(backendUrl, (res) => {
+                console.log(`Self-ping successful: ${res.statusCode}`);
+            }).on('error', (err) => {
+                console.error(`Self-ping failed: ${err.message}`);
+            });
+        }, 14 * 60 * 1000); // 14 minutes
+    }
 });
