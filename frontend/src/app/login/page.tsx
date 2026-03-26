@@ -38,8 +38,12 @@ export default function Login() {
             }
         } catch (err: any) {
             console.error(err);
-            setError(err.response?.data?.message || 'Invalid credentials');
-            setLoading(false);
+            if (err.response?.data?.unverified) {
+                router.push(`/verify?email=${encodeURIComponent(err.response.data.email)}`);
+            } else {
+                setError(err.response?.data?.message || 'Invalid credentials');
+                setLoading(false);
+            }
         }
     };
 

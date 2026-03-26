@@ -1,6 +1,8 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
+const PendingUser = require('../models/PendingUser');
+const sendEmail = require('../utils/sendEmail');
 
 const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -30,28 +32,53 @@ const registerUser = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        // Create user
-        const user = await User.create({
+        // Generate OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const otpExpires = Date.now() + 10 * 60 * 1000;
+
+        // Create Pending User
+        const pendingUser = await PendingUser.create({
             name,
             email,
             password: hashedPassword,
             skillsKnown,
-            skillsToLearn
+            skillsToLearn,
+            otp,
+            otpExpires
         });
 
-        if (user) {
-            res.status(201).json({
-                _id: user.id,
-                name: user.name,
-                email: user.email,
-                title: user.title,
-                bio: user.bio,
-                profilePic: user.profilePic,
-                achievements: user.achievements,
-                skillsKnown: user.skillsKnown,
-                skillsToLearn: user.skillsToLearn,
-                token: generateToken(user.id),
-            });
+        if (pendingUser) {
+            // Send OTP Email
+            const message = `Your verification code is: ${otp}. It will expire in 10 minutes.`;
+            try {
+                await sendEmail({
+                    email: pendingUser.email,
+                    subject: 'Email Verification OTP',
+                    message,
+                    html: `
+                        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e1e1e1; border-radius: 10px;">
+                            <h2 style="color: #4f46e5; text-align: center;">Welcome to SkillSwap!</h2>
+                            <p>Thank you for signing up. Please use the following One-Time Password (OTP) to verify your email address:</p>
+                            <div style="background-color: #f3f4f6; padding: 20px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #1f2937; border-radius: 8px; margin: 20px 0;">
+                                ${otp}
+                            </div>
+                            <p>This code will expire in <strong>10 minutes</strong>.</p>
+                            <p>If you didn't request this, please ignore this email.</p>
+                            <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+                            <p style="font-size: 12px; color: #6b7280; text-align: center;">&copy; 2024 SkillSwap. All rights reserved.</p>
+                        </div>
+                    `,
+                });
+
+                res.status(201).json({
+                    message: 'OTP sent to email. Please verify.',
+                    email: pendingUser.email,
+                    unverified: true
+                });
+            } catch (error) {
+                console.error("Email send error:", error);
+                res.status(500).json({ message: 'Error sending verification email' });
+            }
         } else {
             res.status(400).json({ message: 'Invalid user data' });
         }
@@ -71,6 +98,15 @@ const loginUser = async (req, res) => {
         const user = await User.findOne({ email });
 
         if (user && (await bcrypt.compare(password, user.password))) {
+            // Check if user is verified
+            if (!user.isVerified) {
+                return res.status(401).json({ 
+                    message: 'Please verify your email first',
+                    unverified: true,
+                    email: user.email
+                });
+            }
+
             // Update last login
             user.lastLogin = Date.now();
             await user.save();
@@ -177,10 +213,106 @@ const getUserById = async (req, res) => {
     }
 };
 
+// @desc    Verify Email OTP
+// @route   POST /api/auth/verify-otp
+// @access  Public
+const verifyEmail = async (req, res) => {
+    try {
+        const { email, otp } = req.body;
+
+        const pendingUser = await PendingUser.findOne({ email });
+
+        if (!pendingUser) {
+            return res.status(404).json({ message: 'Verification record not found or expired' });
+        }
+
+        if (pendingUser.otp !== otp || pendingUser.otpExpires < Date.now()) {
+            return res.status(400).json({ message: 'Invalid or expired OTP' });
+        }
+
+        // Create the actual User
+        const user = await User.create({
+            name: pendingUser.name,
+            email: pendingUser.email,
+            password: pendingUser.password,
+            skillsKnown: pendingUser.skillsKnown,
+            skillsToLearn: pendingUser.skillsToLearn,
+            isVerified: true
+        });
+
+        // Delete Pending User
+        await PendingUser.deleteOne({ email });
+
+        res.status(200).json({
+            _id: user.id,
+            name: user.name,
+            email: user.email,
+            title: user.title,
+            bio: user.bio,
+            profilePic: user.profilePic,
+            achievements: user.achievements,
+            skillsKnown: user.skillsKnown,
+            skillsToLearn: user.skillsToLearn,
+            isAdmin: user.isAdmin,
+            token: generateToken(user.id),
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Resend OTP
+// @route   POST /api/auth/resend-otp
+// @access  Public
+const resendOTP = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        const pendingUser = await PendingUser.findOne({ email });
+
+        if (!pendingUser) {
+            return res.status(404).json({ message: 'Verification record not found or expired' });
+        }
+
+        // Generate new OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const otpExpires = Date.now() + 10 * 60 * 1000;
+
+        pendingUser.otp = otp;
+        pendingUser.otpExpires = otpExpires;
+        await pendingUser.save();
+
+        const message = `Your new verification code is: ${otp}. It will expire in 10 minutes.`;
+        await sendEmail({
+            email: pendingUser.email,
+            subject: 'New Verification OTP',
+            message,
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e1e1e1; border-radius: 10px;">
+                    <h2 style="color: #4f46e5; text-align: center;">SkillSwap Verification</h2>
+                    <p>You requested a new verification code. Please use the following OTP:</p>
+                    <div style="background-color: #f3f4f6; padding: 20px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #1f2937; border-radius: 8px; margin: 20px 0;">
+                        ${otp}
+                    </div>
+                    <p>This code will expire in <strong>10 minutes</strong>.</p>
+                    <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+                    <p style="font-size: 12px; color: #6b7280; text-align: center;">&copy; 2024 SkillSwap. All rights reserved.</p>
+                </div>
+            `,
+        });
+
+        res.status(200).json({ message: 'OTP resent successfully' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = {
     registerUser,
     loginUser,
     getMe,
     updateProfile,
-    getUserById
+    getUserById,
+    verifyEmail,
+    resendOTP
 };

@@ -51,8 +51,12 @@ export default function Signup() {
             const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/auth/signup`, userData);
 
             if (res.data) {
-                localStorage.setItem('user', JSON.stringify(res.data));
-                router.push('/dashboard');
+                if (res.data.unverified) {
+                    router.push(`/verify?email=${encodeURIComponent(res.data.email)}`);
+                } else {
+                    localStorage.setItem('user', JSON.stringify(res.data));
+                    router.push('/dashboard');
+                }
             }
         } catch (err: any) {
             console.error(err);
