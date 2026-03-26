@@ -1,50 +1,40 @@
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+/**
+ * Send email using Resend API (To bypass Render SMTP restrictions)
+ * @param {Object} options - Email options (email, subject, message, html)
+ */
 const sendEmail = async (options) => {
-    // 1) Create a transporter
-    const transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 587,
-        secure: false,
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
-        },
-        family: 4, 
-        debug: true, // Show debug output
-        logger: true, // Log information to console
-        connectionTimeout: 30000, // 30 seconds
-        greetingTimeout: 30000,
-        socketTimeout: 60000, // 60 seconds
-        tls: {
-            rejectUnauthorized: false
-        }
-    });
-    
-    console.log(`Attempting to send email to ${options.email} using ${process.env.EMAIL_USER ? 'configured user' : 'MISSING USER'}`);
-
-    // 2) Define the email options
-    const mailOptions = {
-        from: `SkillSwap <${process.env.EMAIL_USER}>`,
-        to: options.email,
-        subject: options.subject,
-        text: options.message,
-        html: options.html,
-    };
-
-    // 3) Actually send the email
     try {
-        await transporter.sendMail(mailOptions);
-        console.log(`Email sent successfully to ${options.email}`);
+        console.log(`Attempting to send email via Resend to ${options.email}...`);
+        
+        const { data, error } = await resend.emails.send({
+            from: 'SkillSwap <onboarding@resend.dev>',
+            to: options.email,
+            subject: options.subject,
+            text: options.message,
+            html: options.html,
+        });
+
+        if (error) {
+            console.error("Resend API Error:", error);
+            throw new Error(error.message);
+        }
+
+        console.log(`Email sent successfully via Resend to ${options.email}. ID: ${data.id}`);
     } catch (error) {
-        console.error("Error sending email:", error);
+        console.error("Critical Email Error (Resend):", error);
+        
+        // Final fallback log for OTP visibility in logs
         console.log("-----------------------------------------");
-        console.log(`DEVELOPMENT OTP for ${options.email}:`);
+        console.log(`FALLBACK OTP for ${options.email}:`);
         console.log(`Subject: ${options.subject}`);
-        console.log(`OTP: ${options.message}`);
+        console.log(`OTP Message: ${options.message}`);
         console.log("-----------------------------------------");
-        // Re-throw if it's not a dev environment, or just let it pass for now
-        // throw error; 
+        
+        throw error;
     }
 };
 
