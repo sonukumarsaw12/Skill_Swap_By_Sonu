@@ -5,16 +5,20 @@ const sendEmail = async (options) => {
     const transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',
         port: 587,
-        secure: false, // Use STARTTLS
+        secure: false,
         auth: {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASS,
         },
-        // Force IPv4 to avoid ENETUNREACH on IPv6-only environments or local networking issues
         family: 4, 
-        connectionTimeout: 15000,
-        greetingTimeout: 15000,
-        socketTimeout: 30000
+        debug: true, // Show debug output
+        logger: true, // Log information to console
+        connectionTimeout: 30000, // 30 seconds
+        greetingTimeout: 30000,
+        socketTimeout: 60000, // 60 seconds
+        tls: {
+            rejectUnauthorized: false
+        }
     });
     
     console.log(`Attempting to send email to ${options.email} using ${process.env.EMAIL_USER ? 'configured user' : 'MISSING USER'}`);
