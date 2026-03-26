@@ -36,16 +36,30 @@ const registerUser = async (req, res) => {
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         const otpExpires = Date.now() + 10 * 60 * 1000;
 
-        // Create Pending User
-        const pendingUser = await PendingUser.create({
-            name,
-            email,
-            password: hashedPassword,
-            skillsKnown,
-            skillsToLearn,
-            otp,
-            otpExpires
-        });
+        // Check if pending user already exists (to handle re-signup before verification)
+        let pendingUser = await PendingUser.findOne({ email });
+
+        if (pendingUser) {
+            // Update existing pending user
+            pendingUser.name = name;
+            pendingUser.password = hashedPassword;
+            pendingUser.skillsKnown = skillsKnown;
+            pendingUser.skillsToLearn = skillsToLearn;
+            pendingUser.otp = otp;
+            pendingUser.otpExpires = otpExpires;
+            await pendingUser.save();
+        } else {
+            // Create New Pending User
+            pendingUser = await PendingUser.create({
+                name,
+                email,
+                password: hashedPassword,
+                skillsKnown,
+                skillsToLearn,
+                otp,
+                otpExpires
+            });
+        }
 
         if (pendingUser) {
             // Send OTP Email
