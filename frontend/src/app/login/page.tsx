@@ -32,13 +32,17 @@ export default function Login() {
         try {
             const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/auth/login`, formData);
 
-            if (res.data) {
+            if (res.data?.requiresOtp) {
+                router.push(`/verify?email=${encodeURIComponent(res.data.email)}`);
+            } else if (res.data) {
                 localStorage.setItem('user', JSON.stringify(res.data));
                 router.push('/dashboard');
             }
         } catch (err: any) {
             console.error(err);
-            if (err.response?.data?.unverified) {
+            if (err.response?.data?.requiresOtp) {
+                router.push(`/verify?email=${encodeURIComponent(err.response.data.email)}`);
+            } else if (err.response?.data?.unverified) {
                 router.push(`/verify?email=${encodeURIComponent(err.response.data.email)}`);
             } else {
                 setError(err.response?.data?.message || 'Invalid credentials');

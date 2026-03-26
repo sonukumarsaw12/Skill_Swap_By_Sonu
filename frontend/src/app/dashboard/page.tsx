@@ -247,7 +247,7 @@ export default function Dashboard() {
                     <div className="space-y-2">
                         <div className="flex items-center gap-2">
                             <h1 className="text-3xl sm:text-4xl md:text-6xl font-extrabold bg-gradient-to-r from-gray-900 via-indigo-900 to-gray-900 dark:from-white dark:via-indigo-200 dark:to-white bg-clip-text text-transparent tracking-tight">
-                                Hello, {user.name.split(' ')[0]}
+                                Hello, {user?.name?.split(' ')[0] || 'User'}
                             </h1>
                             <span className="text-3xl sm:text-4xl md:text-5xl animate-bounce delay-1000 origin-bottom">👋</span>
                         </div>
