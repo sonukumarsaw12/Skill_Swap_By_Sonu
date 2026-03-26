@@ -9,6 +9,8 @@ const sendEmail = async (options) => {
             pass: process.env.EMAIL_PASS,
         },
     });
+    
+    console.log(`Attempting to send email to ${options.email} using ${process.env.EMAIL_USER ? 'configured user' : 'MISSING USER'}`);
 
     // 2) Define the email options
     const mailOptions = {
