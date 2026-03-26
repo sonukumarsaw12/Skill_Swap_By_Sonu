@@ -13,20 +13,32 @@ connectDB();
 const app = express();
 const server = http.createServer(app);
 
-// Helper to normalize CLIENT_URL (ensures protocol exists)
-const getClientUrl = () => {
-    const url = process.env.CLIENT_URL || "http://localhost:3000";
+// Helper to normalize URLs (ensures protocol exists)
+const normalizeUrl = (url) => {
+    if (!url) return null;
     if (url.startsWith('http://') || url.startsWith('https://')) {
         return url;
     }
     return `https://${url}`;
 };
 
-const clientUrl = getClientUrl();
+const allowedOrigins = [
+    normalizeUrl(process.env.CLIENT_URL),
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:5173"
+].filter(Boolean);
 
 // Middleware
 app.use(cors({
-    origin: clientUrl,
+    origin: (origin, callback) => {
+        // allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+        return callback(new Error('Not allowed by CORS'), false);
+    },
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
 }));
@@ -35,7 +47,7 @@ app.use(express.json());
 // Socket.io Setup
 const io = new Server(server, {
     cors: {
-        origin: clientUrl,
+        origin: allowedOrigins,
         methods: ["GET", "POST"]
     }
 });

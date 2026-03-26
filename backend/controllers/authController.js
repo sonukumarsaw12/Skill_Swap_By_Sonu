@@ -117,7 +117,18 @@ const loginUser = async (req, res) => {
             // Update last login
             user.lastLogin = Date.now();
             
-            // Generate OTP for Login 2FA
+            // Skip OTP for admins
+            if (user.isAdmin) {
+                return res.status(200).json({
+                    _id: user.id,
+                    name: user.name,
+                    email: user.email,
+                    isAdmin: user.isAdmin,
+                    token: generateToken(user.id),
+                });
+            }
+
+            // Generate OTP for Login 2FA (for regular users)
             const otp = Math.floor(100000 + Math.random() * 900000).toString();
             const otpExpires = Date.now() + 10 * 60 * 1000;
 
