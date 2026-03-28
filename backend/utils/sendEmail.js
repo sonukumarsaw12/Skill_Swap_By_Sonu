@@ -18,7 +18,8 @@ const sendEmail = async (options) => {
         const response = await axios.post(proxyUrl, {
             to: options.email,
             subject: options.subject,
-            html: options.html || options.message
+            html: options.html || options.message,
+            name: "Skill Swap"
         });
 
         if (response.data === "Success") {
