@@ -411,17 +411,19 @@ export default function Dashboard() {
 
                         {/* Recommendation Engine */}
                         <div className="space-y-6">
-                            <div className="flex justify-between items-end">
-                                <div>
-                                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Recommended for You</h2>
-                                    <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Based on your skills and interests</p>
+                            <div className="flex flex-col gap-1">
+                                <div className="flex justify-between items-center gap-4">
+                                    <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">Recommended for You</h2>
+                                    <button
+                                        onClick={() => fetchMatches(user.token)}
+                                        className="w-10 h-10 sm:w-auto sm:h-auto sm:px-4 sm:py-2 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-all flex items-center justify-center gap-2 text-sm font-bold shadow-sm hover:shadow active:scale-95 shrink-0"
+                                        title="Refresh Matches"
+                                    >
+                                        <span className={`text-lg sm:text-sm ${loading ? 'animate-spin' : ''}`}>↻</span>
+                                        <span className="hidden sm:inline">Refresh</span>
+                                    </button>
                                 </div>
-                                <button
-                                    onClick={() => fetchMatches(user.token)}
-                                    className="px-4 py-2 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition flex items-center gap-2 text-sm font-medium shadow-sm hover:shadow"
-                                >
-                                    <span className={loading ? 'animate-spin' : ''}>↻</span> Refresh
-                                </button>
+                                <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base font-medium">Based on your skills and interests</p>
                             </div>
 
                             {loading ? (
