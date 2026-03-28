@@ -478,7 +478,7 @@ export default function Chat() {
             )}
 
             {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 scrollbar-hide z-10 pb-32">
+            <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 scrollbar-hide z-10 pb-40">
                 {/* Date Separator (Mock) */}
                 <div className="flex justify-center">
                     <span className="text-xs font-bold text-gray-400 dark:text-gray-500 bg-gray-200/50 dark:bg-gray-800/50 px-3 py-1 rounded-full backdrop-blur-sm">Today</span>
@@ -544,8 +544,8 @@ export default function Chat() {
             </div>
 
             {/* Input Area */}
-            <div className="absolute bottom-0 left-0 w-full p-3 md:p-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] z-20 bg-gradient-to-t from-gray-100 via-gray-100/90 to-transparent dark:from-[#0B0F19] dark:via-[#0B0F19]/90 pt-8">
-                <form onSubmit={sendMessage} className="max-w-4xl mx-auto flex items-center gap-2 bg-white dark:bg-gray-900 p-2 md:p-3 rounded-[2rem] shadow-xl border border-gray-200 dark:border-gray-800 ring-1 ring-gray-100 dark:ring-gray-800/50">
+            <div className="absolute bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 w-full max-w-5xl px-4 z-20">
+                <form onSubmit={sendMessage} className="mx-auto flex items-center gap-2 bg-white dark:bg-gray-900/90 backdrop-blur-xl p-2 md:p-3 rounded-[2rem] border border-gray-200 dark:border-gray-800 ring-1 ring-gray-100 dark:ring-gray-800/50 transition-all">
                     <label className="cursor-pointer p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition text-gray-500 dark:text-gray-400 group flex-shrink-0">
                         <input
                             type="file"
