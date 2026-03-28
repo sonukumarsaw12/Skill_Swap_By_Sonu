@@ -138,7 +138,7 @@ function VerifyContent() {
                     )}
 
                     <form onSubmit={onSubmit} className="space-y-8">
-                        <div className="flex justify-between gap-2">
+                        <div className="flex justify-between gap-1.5 sm:gap-2">
                             {otp.map((data, index) => (
                                 <input
                                     key={index}
@@ -148,7 +148,7 @@ function VerifyContent() {
                                     onChange={(e) => handleChange(e.target, index)}
                                     onKeyDown={(e) => handleKeyDown(e, index)}
                                     onFocus={(e) => e.target.select()}
-                                    className="w-12 h-14 md:w-14 md:h-16 text-center text-2xl font-bold bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 outline-none transition-all text-white"
+                                    className="w-10 h-10 sm:w-12 sm:h-14 md:w-14 md:h-16 text-center text-xl md:text-2xl font-bold bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 outline-none transition-all text-white"
                                 />
                             ))}
                         </div>

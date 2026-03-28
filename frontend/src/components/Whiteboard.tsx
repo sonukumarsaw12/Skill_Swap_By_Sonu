@@ -598,8 +598,8 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ socket, user, receiverId, onClo
                         </div>
                     </div>
 
-                    {/* --- Desktop Layout (Bottom Floating Pill) --- */}
-                    <div className="hidden md:flex absolute bottom-6 left-1/2 -translate-x-1/2 z-50 items-center justify-center gap-4 bg-white/90 backdrop-blur-xl px-6 py-3 rounded-full shadow-2xl border border-gray-100/50 transition-all hover:scale-[1.01]">
+                    {/* --- Desktop Layout (Top Floating Pill) --- */}
+                    <div className="hidden md:flex absolute top-6 left-1/2 -translate-x-1/2 z-50 items-center justify-center gap-4 bg-white/90 backdrop-blur-xl px-6 py-3 rounded-full shadow-2xl border border-gray-100/50 transition-all hover:scale-[1.01]">
 
                         {/* Tools Group */}
                         <div className="flex items-center gap-1 pr-4 border-r border-gray-200 shrink-0">
