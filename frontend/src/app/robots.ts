@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: ["/admin/", "/api/"],
     },
-    sitemap: "http://gyaansetu.rf.gd/sitemap.xml",
+    sitemap: "https://gyaansetu-sonu.vercel.app/sitemap.xml",
   };
 }

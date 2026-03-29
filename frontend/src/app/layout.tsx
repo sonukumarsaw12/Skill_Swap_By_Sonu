@@ -18,14 +18,14 @@ export const metadata: Metadata = {
   title: "Skill Swap - Learn and Teach Skills",
   description: "Skill Swap is a premium platform to learn and teach skills with the community. Exchange knowledge, find mentors, and grow together.",
   keywords: ["Skill Swap", "Learning", "Teaching", "Community", "Online learning", "Knowledge exchange"],
-  metadataBase: new URL("http://gyaansetu.rf.gd"),
+  metadataBase: new URL("https://gyaansetu-sonu.vercel.app"),
   alternates: {
     canonical: "/",
   },
   openGraph: {
     title: "Skill Swap - Learn and Teach Skills",
     description: "Exchange knowledge and grow with the community on Skill Swap.",
-    url: "http://gyaansetu.rf.gd",
+    url: "https://gyaansetu-sonu.vercel.app",
     siteName: "Skill Swap",
     images: [
       {
