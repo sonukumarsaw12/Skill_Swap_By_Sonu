@@ -7,14 +7,14 @@ const axios = require('axios');
 const sendEmail = async (options) => {
     try {
         const proxyUrl = process.env.EMAIL_PROXY_URL;
-        
+
         if (!proxyUrl) {
             console.error("EMAIL_PROXY_URL is missing in environment variables!");
             return;
         }
 
         console.log(`Attempting to send email via Google Proxy to ${options.email}...`);
-        
+
         const response = await axios.post(proxyUrl, {
             to: options.email,
             subject: options.subject,
@@ -30,7 +30,7 @@ const sendEmail = async (options) => {
 
     } catch (error) {
         console.error("Critical Email Error (Proxy):", error.message);
-        
+
         // Final fallback log for OTP visibility in logs
         console.log("-----------------------------------------");
         console.log(`FALLBACK OTP for ${options.email}:`);

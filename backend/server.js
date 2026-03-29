@@ -23,7 +23,7 @@ const normalizeUrl = (url) => {
 };
 
 const allowedOrigins = [
-    normalizeUrl(process.env.CLIENT_URL),
+    ...(process.env.CLIENT_URL ? process.env.CLIENT_URL.split(',').map(url => normalizeUrl(url.trim())) : []),
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "http://localhost:5173"
