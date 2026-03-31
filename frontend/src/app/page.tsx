@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowRight, Code, Palette, BookOpen, Zap, Layers, Globe, Smartphone, Database, Menu, X } from 'lucide-react';
+import { ArrowRight, Code, Palette, BookOpen, Zap, Layers, Globe, Smartphone, Database, Menu, X, Target, Users, Award, Linkedin, Github, Mail } from 'lucide-react';
 import { TypewriterEffect } from '@/components/TypewriterEffect';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
@@ -148,7 +148,7 @@ export default function Home() {
             </button>
 
             <button
-              onClick={() => router.push('/about')}
+              onClick={() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })}
               className="w-full sm:w-auto px-8 py-4 bg-white dark:bg-white/5 backdrop-blur-sm text-gray-700 dark:text-gray-200 rounded-2xl font-bold text-lg border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/10 hover:border-gray-300 dark:hover:border-white/20 transition-all flex items-center justify-center gap-2"
             >
               <BookOpen className="w-5 h-5" /> Learn More
@@ -190,6 +190,127 @@ export default function Home() {
               </p>
             </div>
           ))}
+        </div>
+
+        {/* About Section */}
+        <div id="about" className="mt-24 md:mt-40 w-full max-w-7xl px-4 md:px-0">
+          <div className="relative group">
+            <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-[2.5rem] blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+            <div className="relative bg-white/60 dark:bg-gray-900/60 backdrop-blur-2xl p-8 md:p-16 rounded-[2.5rem] border border-white/40 dark:border-white/10 shadow-2xl flex flex-col md:flex-row items-center gap-10 md:gap-16">
+              <div className="flex-1 space-y-6 text-left">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-xs font-bold uppercase tracking-wider">
+                  <Target className="w-3 h-3" /> Our Mission
+                </div>
+                <h2 className="text-3xl md:text-5xl font-extrabold text-gray-900 dark:text-white leading-tight">
+                  Connecting Minds, <br />
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">One Skill at a Time</span>
+                </h2>
+                <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed font-medium">
+                  SkillSwap is a collaborative learning network where your knowledge is your currency. 
+                  We believe everyone has something to teach and something to learn. 
+                  Our platform bridges the gap between those who seek mastery and those who have achieved it.
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
+                  {[
+                    { icon: <Users className="w-5 h-5 text-blue-500" />, text: "Collective Network" },
+                    { icon: <Zap className="w-5 h-5 text-yellow-500" />, text: "Real-time Exchange" },
+                    { icon: <Award className="w-5 h-5 text-purple-500" />, text: "Zero Cost Learning" },
+                    { icon: <Globe className="w-5 h-5 text-emerald-500" />, text: "Global Community" },
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-center gap-3 p-3 bg-white/40 dark:bg-white/5 rounded-2xl border border-white/40 dark:border-white/5">
+                      {item.icon}
+                      <span className="text-sm font-bold text-gray-700 dark:text-gray-200">{item.text}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="w-full md:w-1/3 aspect-square relative">
+                <div className="absolute inset-0 bg-indigo-500/20 rounded-[2rem] blur-2xl animate-pulse"></div>
+                <div className="relative h-full bg-gradient-to-br from-indigo-500 to-purple-600 rounded-[2.5rem] p-1 flex items-center justify-center overflow-hidden group/img shadow-2xl">
+                  <div className="absolute inset-0 bg-black/20 group-hover/img:bg-transparent transition-colors duration-500"></div>
+                  <img 
+                    src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=2671&auto=format&fit=crop" 
+                    alt="Collaborative learning" 
+                    className="w-full h-full object-cover rounded-[2.4rem] transform transition-transform duration-700 group-hover/img:scale-110"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Founder Section */}
+        <div className="mt-24 md:mt-40 w-full max-w-7xl px-4 md:px-0 mb-20">
+          <div className="text-center space-y-4 mb-16">
+            <h2 className="text-3xl md:text-5xl font-extrabold text-gray-900 dark:text-white">Meet the <span className="text-indigo-600">Visionary</span></h2>
+            <p className="text-gray-500 dark:text-gray-400 font-medium max-w-2xl mx-auto">The driving force behind SkillSwap's mission to democratize education.</p>
+          </div>
+
+          <div className="grid md:grid-cols-1 max-w-4xl mx-auto">
+            <div className="relative group">
+              <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-[3rem] blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+              <div className="relative bg-white/40 dark:bg-gray-800/40 backdrop-blur-xl rounded-[3rem] p-8 md:p-12 border border-white/40 dark:border-white/5 flex flex-col md:flex-row items-center gap-10 md:gap-14 shadow-xl">
+                <div className="w-48 h-48 md:w-64 md:h-64 flex-shrink-0 relative">
+                  <div className="absolute inset-0 bg-indigo-500/20 rounded-full blur-xl animate-pulse"></div>
+                  <div className="relative w-full h-full rounded-full p-1.5 bg-gradient-to-tr from-blue-500 via-indigo-600 to-purple-600 shadow-2xl">
+                    <div className="w-full h-full rounded-full overflow-hidden border-4 border-white dark:border-gray-900">
+                      <div className="w-full h-full bg-[#dbdbdb] flex items-center justify-center">
+                        <img 
+                          src="/images/founder_photo.jpg" 
+                          alt="Sonu Kumar Saw" 
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="absolute -bottom-2 -right-2 bg-yellow-400 p-3 rounded-2xl shadow-lg border-2 border-white dark:border-black animate-bounce">
+                    <Zap className="w-5 h-5 text-white fill-white" />
+                  </div>
+                </div>
+                
+                <div className="flex-1 text-left space-y-6">
+                  <div className="space-y-1">
+                    <h3 className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white leading-none">Sonu Kumar Saw</h3>
+                    <p className="text-indigo-600 dark:text-indigo-400 font-bold uppercase tracking-widest text-sm">Founder & Lead Architect</p>
+                  </div>
+                  
+                  <p className="text-gray-600 dark:text-gray-300 text-lg leading-relaxed font-medium">
+                    "SkillSwap was born from a simple belief: knowledge should never be gated by wealth. 
+                    My goal is to create a world where anyone can master any skill simply by sharing what they already know. 
+                    Building this platform is more than code—it's about building futures."
+                  </p>
+                  
+                  <div className="flex items-center gap-4 pt-2">
+                    <a 
+                      href="https://www.linkedin.com/in/sonu-kumar-saw-24a426242" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="p-3 bg-white dark:bg-white/5 rounded-2xl border border-gray-200 dark:border-white/10 hover:bg-indigo-600 hover:text-white transition-all group/link"
+                      title="LinkedIn"
+                    >
+                      <Linkedin className="w-5 h-5 group-hover/link:scale-110 transition-transform" />
+                    </a>
+                    <a 
+                      href="https://github.com/sonukumarsaw12" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="p-3 bg-white dark:bg-white/5 rounded-2xl border border-gray-200 dark:border-white/10 hover:bg-gray-900 dark:hover:bg-white hover:text-white dark:hover:text-black transition-all group/link"
+                      title="GitHub"
+                    >
+                      <Github className="w-5 h-5 group-hover/link:scale-110 transition-transform" />
+                    </a>
+                    <a 
+                      href="mailto:skrajsonu6200@gmail.com" 
+                      className="p-3 bg-white dark:bg-white/5 rounded-2xl border border-gray-200 dark:border-white/10 hover:bg-red-500 hover:text-white transition-all group/link"
+                      title="Email"
+                    >
+                      <Mail className="w-5 h-5 group-hover/link:scale-110 transition-transform" />
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
       </main>
